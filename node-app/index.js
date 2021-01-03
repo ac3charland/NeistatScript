@@ -73,8 +73,8 @@ function getNewToken(oAuth2Client, callback) {
 }
 
 async function createNewVlogRow(auth) {
-
-    const nextVlogIndex = await getNextVlogNumber(auth)
+    const sheets = google.sheets({version: 'v4', auth})
+    const nextVlogIndex = await getNextVlogNumber(sheets)
     const nextVlog = await getNextVlog(auth, nextVlogIndex)
 
     const nextVlogNumber = nextVlogIndex + 1
@@ -83,11 +83,25 @@ async function createNewVlogRow(auth) {
     const {title, publishedAt, resourceId} = nextVlog?.snippet
     const url = `https://www.youtube.com/watch?v=${resourceId.videoId}`
     const uploaded = moment(publishedAt).format('M/D/YYYY')
-    const notesUrl = keys.notesUrl
+    const notesUrl = keys.list.notesUrl
+
+    const data = [
+        {
+            range: `Vlogs!A${nextVlogNumber + 1}:I${nextVlogNumber + 1}`,
+            values: [[nextVlogNumberText], [title], [uploaded], [cataloguedDate], [], [], [], [notesUrl], [url]],
+            majorDimension: 'COLUMNS'
+        }
+    ]
+
+    const resource = {
+        data,
+        valueInputOption: 'USER_ENTERED'
+    }
+
+    updateSheet(sheets, resource)
 }
 
-async function getNextVlogNumber(auth) {
-    const sheets = google.sheets({version: 'v4', auth})
+async function getNextVlogNumber(sheets) {
     const response = await sheets.spreadsheets.values.get({
         spreadsheetId: keys.list.spreadsheetId,
         range: 'Vlogs!A2:A',
@@ -106,4 +120,14 @@ async function getNextVlog(auth, index) {
     })
     const vlogs = response.data.items
     return vlogs[index]
+}
+
+function updateSheet(sheets, resource) {
+    sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId: keys.list.spreadsheetId,
+        resource: resource,
+    }, (err, res) => {
+        if (err) return console.log('The API returned an error: ' + err)
+        console.log('Update successful!')
+    })
 }

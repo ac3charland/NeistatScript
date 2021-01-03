@@ -1,4 +1,4 @@
-cd ~/Documents/Other/VlogCatalog/
+cd ~/docs/Other/VlogCatalog/
 FOLDERCOUNT=$(ls -l | grep -c ^d)
 NEWFOLDERNUM=$((FOLDERCOUNT+1))
 NEWFOLDERNAME="VLOG_00${NEWFOLDERNUM}"

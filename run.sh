@@ -1,8 +1,20 @@
+val=$(node node-app/index.js)
+
 cd ~/docs/Other/VlogCatalog/
 FOLDERCOUNT=$(ls -l | grep -c ^d)
 NEWFOLDERNUM=$((FOLDERCOUNT+1))
-NEWFOLDERNAME="VLOG_00${NEWFOLDERNUM}"
+NUMLENGTH=${#NEWFOLDERNUM}
+NUMZEROS=$((3-${NUMLENGTH}))
+ZEROS=$(printf '0%.0s' $(seq 1 $NUMZEROS))
+NEWFOLDERNAME="VLOG_${NEWFOLDERNUM}"
+
+if [ $NUMZEROS -gt 0 ]
+then
+    NEWFOLDERNAME="VLOG_${ZEROS}${NEWFOLDERNUM}"
+fi
+
 mkdir ${NEWFOLDERNAME}
 cd ${NEWFOLDERNAME}
-youtube-dl $1
-open .
+youtube-dl -f mp4 $val
+open *.mp4
+open -a Firefox "https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit#gid=0"

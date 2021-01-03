@@ -98,7 +98,8 @@ async function createNewVlogRow(auth) {
         valueInputOption: 'USER_ENTERED'
     }
 
-    updateSheet(sheets, resource)
+    await updateSheet(sheets, resource)
+    console.log(url)
 }
 
 async function getNextVlogNumber(sheets) {
@@ -122,12 +123,12 @@ async function getNextVlog(auth, index) {
     return vlogs[index]
 }
 
-function updateSheet(sheets, resource) {
+async function updateSheet(sheets, resource) {
     sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: keys.list.spreadsheetId,
         resource: resource,
     }, (err, res) => {
         if (err) return console.log('The API returned an error: ' + err)
-        console.log('Update successful!')
+        return "fuck your face"
     })
 }

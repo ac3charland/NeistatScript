@@ -72,24 +72,38 @@ function getNewToken(oAuth2Client, callback) {
     })
 }
 
-function createNewVlogRow(auth) {
+async function createNewVlogRow(auth) {
+
+    const nextVlogIndex = await getNextVlogNumber(auth)
+    const nextVlog = await getNextVlog(auth, nextVlogIndex)
+
+    const nextVlogNumber = nextVlogIndex + 1
+    const nextVlogNumberText = `VLOG_${'0'.repeat(3 - nextVlogNumber.toString().length)}${nextVlogNumber}`
+    const cataloguedDate = moment().format('M/D/YYYY')
+    const {title, publishedAt, resourceId} = nextVlog?.snippet
+    const url = `https://www.youtube.com/watch?v=${resourceId.videoId}`
+    const uploaded = moment(publishedAt).format('M/D/YYYY')
+    const notesUrl = keys.notesUrl
+}
+
+async function getNextVlogNumber(auth) {
     const sheets = google.sheets({version: 'v4', auth})
-    sheets.spreadsheets.values.get({
+    const response = await sheets.spreadsheets.values.get({
         spreadsheetId: keys.list.spreadsheetId,
         range: 'Vlogs!A2:A',
-    }, (err, res) => {
-        if (err) return console.log('The API returned an error: ' + err)
-        const rows = res.data.values
-        if (rows.length) {
-            const nextVlogNumber = rows.length + 1
-            const nextVlogNumberText = `VLOG_${'0'.repeat(3 - nextVlogNumber.toString().length)}${nextVlogNumber}`
-            const cataloguedDate = moment().format('M/D/YYYY')
-            console.log('Next vlog:', nextVlogNumberText)
-            console.log('CataloguedDate:', cataloguedDate)
-
-            
-        } else {
-            console.log('No entries found')
-        }
     })
+    return response.data.values.length
+}
+
+async function getNextVlog(auth, index) {
+    const response = await google.youtube('v3').playlistItems.list({
+        auth,
+        part: [
+            "snippet"
+        ],
+        maxResults: 365,
+        playlistId: "PLTHOlLMWEwVy52FUngq91krMkQDQBagYw"
+    })
+    const vlogs = response.data.items
+    return vlogs[index]
 }

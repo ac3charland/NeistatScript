@@ -129,6 +129,5 @@ async function updateSheet(sheets, resource) {
         resource: resource,
     }, (err, res) => {
         if (err) return console.log('The API returned an error: ' + err)
-        return "fuck your face"
     })
 }

@@ -87,8 +87,8 @@ async function createNewVlogRow(auth) {
 
     const data = [
         {
-            range: `Vlogs!A${nextVlogNumber + 1}:I${nextVlogNumber + 1}`,
-            values: [[nextVlogNumberText], [title], [uploaded], [cataloguedDate], [], [], [], [notesUrl], [url]],
+            range: `Vlogs!A${nextVlogNumber + 1}:J${nextVlogNumber + 1}`,
+            values: [[nextVlogNumberText], [title], [uploaded], [cataloguedDate], [], [], [], [], [notesUrl], [url]],
             majorDimension: 'COLUMNS'
         }
     ]
@@ -111,16 +111,27 @@ async function getNextVlogNumber(sheets) {
 }
 
 async function getNextVlog(auth, index) {
-    const response = await google.youtube('v3').playlistItems.list({
-        auth,
-        part: [
-            "snippet"
-        ],
-        maxResults: 365,
-        playlistId: "PLTHOlLMWEwVy52FUngq91krMkQDQBagYw"
-    })
-    const vlogs = response.data.items
-    return vlogs[index]
+    const maxResults = 50
+    let totalResults = 0
+    let vlogs = []
+    let pageToken
+
+    while (index + 1 > totalResults) {
+        const response = await google.youtube('v3').playlistItems.list({
+            auth,
+            part: [
+                "snippet"
+            ],
+            maxResults,
+            playlistId: "PLTHOlLMWEwVy52FUngq91krMkQDQBagYw",
+            pageToken
+        })
+        pageToken = response.data.nextPageToken
+        vlogs = response.data.items
+        totalResults += 50
+    } 
+    
+    return vlogs[index + maxResults - totalResults]
 }
 
 async function updateSheet(sheets, resource) {

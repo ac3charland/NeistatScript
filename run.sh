@@ -1,7 +1,7 @@
 val=$(node node-app/index.js)
 set -o allexport; source .env; set +o allexport;
 
-cd ~/docs/Other/VlogCatalog/
+cd ~/docs/Videos/VlogCatalog/
 FOLDERCOUNT=$(ls -l | grep -c ^d)
 NEWFOLDERNUM=$((FOLDERCOUNT+1))
 NUMLENGTH=${#NEWFOLDERNUM}

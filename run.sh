@@ -16,7 +16,7 @@ fi
 
 mkdir ${NEWFOLDERNAME}
 cd ${NEWFOLDERNAME}
-youtube-dl -f mp4 $val
+yt-dlp -f mp4 $val
 open *.mp4
 open ./
 open -a Firefox "https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit#gid=0"
